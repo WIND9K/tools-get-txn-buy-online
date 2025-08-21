@@ -1,0 +1,6 @@
+2025-08-21 14:12:27,455 | INFO | main-bot | Deleted webhook & dropped pending updates.
+2025-08-21 14:12:27,455 | INFO | main-bot | Starting bot...
+2025-08-21 14:12:28,617 | INFO | telegram.ext.Application | Application started
+2025-08-21 14:12:38,393 | INFO | main-bot | Step1: logged -> telegram_group_log.csv
+2025-08-21 14:24:15,843 | INFO | main-bot | Step1: logged -> telegram_group_log.csv
+^C
