@@ -20,7 +20,7 @@ BOT_TOKEN = {
 
 # ===== Targets (B1 không gửi, chỉ lắng nghe) =====
 GROUP_CHAT_IDS: list[int] = []               # để trống ở B1
-CHANNEL_ID: int | str | None = None          # để trống ở B1
+CHANNEL_ID: int | str | None = "-1002961730138"         # để trống ở B1
 
 # ===== CSV =====
 CSV_PATH = DATA_DIR / "telegram_group_log.csv"
@@ -49,4 +49,8 @@ ONLY_CHAT_ID: int | None = None
 LISTEN_CHANNEL_ID: int | None = None
 
 # ===== Feature flags =====
-ENABLE_B2 = False      # tắt hoàn toàn Bước 2 trong B1
+B2_NOTIFY = {
+    "enabled": True,
+    "template": "B2 | vndc_code: {vndc_code} | user_id: {user_id} | status: {status}",
+    "only_when": ["ok"]
+}
