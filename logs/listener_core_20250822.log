@@ -1,0 +1,18 @@
+2025-08-22 16:20:03,040 | INFO | root | Python logging to G:\Learn\Onus get txn buy online\logs\listener_core_20250822.log
+2025-08-22 16:20:03,704 | INFO | listener-main | LISTENER identity: @get_infomations_bot (id=7624727793)
+2025-08-22 16:20:04,281 | INFO | listener-main | Deleted webhook & dropped pending updates.
+2025-08-22 16:20:04,281 | INFO | listener-main | Starting listener...
+2025-08-22 16:20:05,455 | INFO | httpx | HTTP Request: POST https://api.telegram.org/bot7624727793:AAFOTrGlR5ugh_OHX1p5TWFvAJHCvPdSvJ4/getMe "HTTP/1.1 200 OK"
+2025-08-22 16:20:05,645 | INFO | httpx | HTTP Request: POST https://api.telegram.org/bot7624727793:AAFOTrGlR5ugh_OHX1p5TWFvAJHCvPdSvJ4/deleteWebhook "HTTP/1.1 200 OK"
+2025-08-22 16:20:05,647 | INFO | telegram.ext.Application | Application started
+2025-08-22 16:20:14,011 | INFO | httpx | HTTP Request: POST https://api.telegram.org/bot7624727793:AAFOTrGlR5ugh_OHX1p5TWFvAJHCvPdSvJ4/getUpdates "HTTP/1.1 200 OK"
+2025-08-22 16:20:14,012 | WARNING | logger-handlers | Skip channel_post: LISTEN_CHANNEL_ID=-1002961730138, got=-1002961730138
+2025-08-22 16:20:26,576 | INFO | httpx | HTTP Request: POST https://api.telegram.org/bot7624727793:AAFOTrGlR5ugh_OHX1p5TWFvAJHCvPdSvJ4/getUpdates "HTTP/1.1 200 OK"
+2025-08-22 16:20:26,577 | WARNING | logger-handlers | Skip channel_post: LISTEN_CHANNEL_ID=-1002961730138, got=-1002961730138
+2025-08-22 16:21:16,771 | INFO | httpx | HTTP Request: POST https://api.telegram.org/bot7624727793:AAFOTrGlR5ugh_OHX1p5TWFvAJHCvPdSvJ4/getUpdates "HTTP/1.1 200 OK"
+2025-08-22 16:22:06,965 | INFO | httpx | HTTP Request: POST https://api.telegram.org/bot7624727793:AAFOTrGlR5ugh_OHX1p5TWFvAJHCvPdSvJ4/getUpdates "HTTP/1.1 200 OK"
+2025-08-22 16:22:57,160 | INFO | httpx | HTTP Request: POST https://api.telegram.org/bot7624727793:AAFOTrGlR5ugh_OHX1p5TWFvAJHCvPdSvJ4/getUpdates "HTTP/1.1 200 OK"
+2025-08-22 16:23:47,355 | INFO | httpx | HTTP Request: POST https://api.telegram.org/bot7624727793:AAFOTrGlR5ugh_OHX1p5TWFvAJHCvPdSvJ4/getUpdates "HTTP/1.1 200 OK"
+2025-08-22 16:24:37,550 | INFO | httpx | HTTP Request: POST https://api.telegram.org/bot7624727793:AAFOTrGlR5ugh_OHX1p5TWFvAJHCvPdSvJ4/getUpdates "HTTP/1.1 200 OK"
+2025-08-22 16:35:23,874 | INFO | root | Python logging to G:\Learn\Onus get txn buy online\logs\listener_core_20250822.log
+2025-08-22 16:35:28,025 | INFO | root | Python logging to G:\Learn\Onus get txn buy online\logs\listener_core_20250822.log

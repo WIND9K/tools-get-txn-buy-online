@@ -1,0 +1,12 @@
+Starting MAIN (stage=listen). Logs =
+
+===== START Fri 08/22/2025 16:43:04.86 (stage=listen) =====
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "G:\Learn\Onus get txn buy online\src\main.py", line 20, in <module>
+    root.addHandler(ch)
+    ^^^^
+NameError: name 'root' is not defined. Did you mean: '_root'?
+
+===== STOP  Fri 08/22/2025 16:43:04.92 (exit=1) =====
