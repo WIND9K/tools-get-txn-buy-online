@@ -1,41 +1,33 @@
 # src/utils/csv_log.py
 # -*- coding: utf-8 -*-
+from __future__ import annotations
 import csv, time
 from pathlib import Path
 from datetime import datetime
 
-def _ensure_header_compatible(csv_path: Path, columns: list[str]) -> Path:
+def _ensure_header_compatible(csv_path: Path, columns: list[str]) -> tuple[Path, bool]:
     """
-    Nếu file chưa tồn tại -> dùng csv_path.
-    Nếu tồn tại nhưng header khác -> tạo file mới kèm dấu thời gian để không ghi sai cột.
+    Trả về (path để ghi, header_needed)
+    - Nếu file chưa tồn tại -> header_needed=True.
+    - Nếu đã tồn tại nhưng header khác -> tạo file mới kèm timestamp (tránh lệch cột).
     """
-    if not csv_path.exists():
-        return csv_path
+    p = Path(csv_path)
+    if not p.exists():
+        return p, True
     try:
-        with csv_path.open("r", encoding="utf-8-sig", newline="") as f:
-            first = f.readline().strip("\n\r")
-            # so sánh thô: tên cột ngăn bởi dấu phẩy
-            current = first.split(",")
-            if [c.strip() for c in current] == [c.strip() for c in columns]:
-                return csv_path
+        with p.open("r", encoding="utf-8-sig", newline="") as f:
+            header = f.readline().strip("\r\n")
+            current = [c.strip() for c in header.split(",")] if header else []
+            if current == [c.strip() for c in columns]:
+                return p, False
     except Exception:
-        # nếu đọc lỗi, fallback mở file mới
         pass
-    # tạo file mới với hậu tố thời gian
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    new_path = csv_path.with_name(f"{csv_path.stem}_{ts}{csv_path.suffix}")
-    return new_path
+    newp = p.with_name(f"{p.stem}_{ts}{p.suffix}")
+    return newp, True
 
-def append_csv(row: dict, csv_path: Path, columns: list[str], retries: int = 3, delay: float = 0.6) -> Path:
-    """
-    Ghi 1 dòng CSV theo thứ tự cột 'columns'.
-    - Nếu header file đang có không khớp columns -> tự tạo file mới với hậu tố thời gian.
-    - Trả về path file thực sự đã ghi (hữu ích để log).
-    """
-    target_path = _ensure_header_compatible(Path(csv_path), columns)
-    header_needed = not target_path.exists()
-
-    # lọc/điền đủ cột theo cấu hình
+def append_csv(row: dict, csv_path: Path, columns: list[str], retries: int = 3, delay: float = 0.5) -> Path:
+    target_path, header_needed = _ensure_header_compatible(csv_path, columns)
     row_out = {col: (row.get(col, "") if row.get(col, "") is not None else "") for col in columns}
 
     for _ in range(retries):
@@ -49,5 +41,4 @@ def append_csv(row: dict, csv_path: Path, columns: list[str], retries: int = 3, 
             return target_path
         except PermissionError:
             time.sleep(delay)
-    # nếu vẫn lỗi -> ném ra để caller log
     raise

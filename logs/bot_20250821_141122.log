@@ -1,0 +1,62 @@
+2025-08-21 14:11:23,914 | INFO | main-bot | Deleted webhook & dropped pending updates.
+2025-08-21 14:11:23,914 | INFO | main-bot | Starting bot...
+2025-08-21 14:11:25,087 | INFO | telegram.ext.Application | Application started
+2025-08-21 14:11:38,568 | INFO | main-bot | Step1: logged -> telegram_group_log.csv
+2025-08-21 14:11:53,338 | ERROR | telegram.ext.Application | No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "G:\Learn\Onus get txn buy online\.venv\Lib\site-packages\telegram\ext\_application.py", line 1311, in process_update
+    await coroutine
+  File "G:\Learn\Onus get txn buy online\.venv\Lib\site-packages\telegram\ext\_handlers\basehandler.py", line 158, in handle_update
+    return await self.callback(update, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\Learn\Onus get txn buy online\src\main.py", line 148, in on_message
+    step1_log_message(
+    ~~~~~~~~~~~~~~~~~^
+        date_iso=(msg.date.isoformat() if msg.date else ""),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        reply_to=(msg.reply_to_message.message_id if msg.reply_to_message else ""),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "G:\Learn\Onus get txn buy online\src\main.py", line 81, in step1_log_message
+    pd.DataFrame([row]).to_csv(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        CSV_PATH, mode="a", header=header, index=False, encoding="utf-8-sig"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "G:\Learn\Onus get txn buy online\.venv\Lib\site-packages\pandas\util\_decorators.py", line 333, in wrapper
+    return func(*args, **kwargs)
+  File "G:\Learn\Onus get txn buy online\.venv\Lib\site-packages\pandas\core\generic.py", line 3986, in to_csv
+    return DataFrameRenderer(formatter).to_csv(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        path_or_buf,
+        ^^^^^^^^^^^^
+    ...<14 lines>...
+        storage_options=storage_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "G:\Learn\Onus get txn buy online\.venv\Lib\site-packages\pandas\io\formats\format.py", line 1014, in to_csv
+    csv_formatter.save()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "G:\Learn\Onus get txn buy online\.venv\Lib\site-packages\pandas\io\formats\csvs.py", line 251, in save
+    with get_handle(
+         ~~~~~~~~~~^
+        self.filepath_or_buffer,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        storage_options=self.storage_options,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ) as handles:
+    ^
+  File "G:\Learn\Onus get txn buy online\.venv\Lib\site-packages\pandas\io\common.py", line 873, in get_handle
+    handle = open(
+        handle,
+    ...<3 lines>...
+        newline="",
+    )
+PermissionError: [Errno 13] Permission denied: 'G:\\Learn\\Onus get txn buy online\\data\\telegram_group_log.csv'
+2025-08-21 14:12:00,660 | INFO | main-bot | Step1: logged -> telegram_group_log.csv
+2025-08-21 14:12:04,459 | INFO | main-bot | Step1: logged -> telegram_group_log.csv

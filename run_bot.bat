@@ -1,9 +1,5 @@
 @echo off
-REM ============================
-REM Onus Process Txn - Run B1
-REM Double click để chạy listener
-REM ============================
-
+REM ===== Onus Process Txn - B1 (Listener) =====
 cd /d "%~dp0"
 set "PY_EXE=python"
 if exist ".\venv\Scripts\python.exe" set "PY_EXE=.\venv\Scripts\python.exe"

@@ -1,0 +1,5 @@
+2025-08-21 15:07:34,557 | INFO | main-bot | Deleted webhook & dropped pending updates.
+2025-08-21 15:07:34,557 | INFO | main-bot | Starting bot...
+2025-08-21 15:07:35,757 | INFO | telegram.ext.Application | Application started
+2025-08-21 15:07:39,197 | INFO | group-logger | Logged sender_chat message: user_id= sender_chat=-1002961730138 via_bot=
+2025-08-21 15:08:03,877 | INFO | group-logger | Logged sender_chat message: user_id= sender_chat=-1002961730138 via_bot=

@@ -1,25 +1,24 @@
 # src/handlers/logger_handlers.py
 # -*- coding: utf-8 -*-
-import logging, asyncio
+from __future__ import annotations
+import logging
 from datetime import datetime, timezone
 from telegram import Update, Message
 from telegram.ext import ContextTypes
 
-from src.utils.csv_log import append_csv
-from src.utils.parse import parse_fields, parse_kcc_packet
-from src.get_userid_from_txn import get_user_id_from_vndc
-from src.utils.notify import send_via_ksnb
 import src.config as CFG
+from src.utils.parse import parse_kcc_packet, parse_fields
+from src.utils.csv_log import append_csv
 
 logger = logging.getLogger("logger-handlers")
 
-# ---- Config with safe defaults ----
+# Config với giá trị mặc định an toàn
 CSV_PATH = CFG.CSV_PATH
-CSV_COLUMNS = getattr(CFG, "CSV_COLUMNS", [])
+CSV_COLUMNS = CFG.CSV_COLUMNS
 ONLY_CHAT_ID = getattr(CFG, "ONLY_CHAT_ID", None)
 LISTEN_CHANNEL_ID = getattr(CFG, "LISTEN_CHANNEL_ID", None)
 FILTERS = getattr(CFG, "FILTERS", type("F", (), {"enabled": True, "require_kcc_packet": False, "log_non_matching": True})())
-B2_NOTIFY = getattr(CFG, "B2_NOTIFY", {"enabled": False, "template": "", "only_when": []})
+ENABLE_B2 = getattr(CFG, "ENABLE_B2", False)  # đang tắt
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.effective_message
@@ -71,60 +70,25 @@ async def _process_pipeline(msg: Message):
     text = (msg.text or msg.caption or "").strip()
     pkt = parse_kcc_packet(text)
 
-    # Không match KCC
+    # Non-KCC
     if not pkt:
-        if not FILTERS.enabled or FILTERS.require_kcc_packet or not FILTERS.log_non_matching:
-            return
+        if not FILTERS.enabled: return
+        if FILTERS.require_kcc_packet: return
+        if not FILTERS.log_non_matching: return
         fields = parse_fields(text)
         row = _build_base_row(msg, text, fields)
-        row.update({"user_id_resolved": "", "pipeline_note": "non_matching"})
         _append(row)
         return
 
-    # Match KCC
-    vndc_code = pkt["vndc_code"] if isinstance(pkt, dict) else pkt.vndc_code
-    name_bank = pkt.get("name_bank", "") if isinstance(pkt, dict) else getattr(pkt, "name_bank", "")
-    name_order = pkt.get("name_order", "") if isinstance(pkt, dict) else getattr(pkt, "name_order", "")
-    fields = {"vndc_code": vndc_code, "name_bank": name_bank, "name_order": name_order}
-    base_row = _build_base_row(msg, text, fields)
-
-    print(f"[EVENT] vndc_code={vndc_code} | name_order={name_order}")
-
-    # B2: resolve user_id
-    user_id_resolved, pipeline_note = "", "ok"
-    try:
-        user_id_resolved = await asyncio.to_thread(get_user_id_from_vndc, vndc_code)
-        if not user_id_resolved:
-            pipeline_note = "resolve_none"
-    except Exception as e:
-        pipeline_note = f"resolve_error={e!r}"
-        logger.exception("Resolve user_id failed: %s", e)
-
-    print(f"[B2] vndc_code={vndc_code} -> user_id={user_id_resolved or '∅'} ({pipeline_note})")
-
-    base_row.update({"user_id_resolved": (user_id_resolved or ""), "pipeline_note": pipeline_note})
-
-    # Notify B2
-    try:
-        if B2_NOTIFY.get("enabled", False):
-            only_when = B2_NOTIFY.get("only_when", [])
-            if (not only_when) or (pipeline_note in only_when):
-                msg_text = B2_NOTIFY.get(
-                    "template",
-                    "B2 | vndc_code: {vndc_code} | name_bank: {name_bank}"
-                ).format(
-                    vndc_code=vndc_code,
-                    name_bank=name_bank,
-                    name_order=name_order,
-                    user_id_resolved=user_id_resolved or "",
-                    pipeline_note=pipeline_note,
-                )
-                res = send_via_ksnb(msg_text)
-                logger.info("B2 notify results: sent=%s failed=%s", res.get("sent"), res.get("failed"))
-    except Exception as e:
-        logger.exception("B2 notify error: %s", e)
-
-    _append(base_row)
+    # KCC matched
+    fields = {
+        "vndc_code": pkt["vndc_code"] if isinstance(pkt, dict) else pkt.vndc_code,
+        "name_bank": (pkt.get("name_bank", "") if isinstance(pkt, dict) else getattr(pkt, "name_bank", "")) or "",
+        "name_order": (pkt.get("name_order", "") if isinstance(pkt, dict) else getattr(pkt, "name_order", "")) or "",
+    }
+    print(f"[EVENT] KCC matched vndc_code={fields['vndc_code']} | name_order={fields['name_order']}")
+    row = _build_base_row(msg, text, fields)
+    _append(row)
 
 async def on_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.effective_message
