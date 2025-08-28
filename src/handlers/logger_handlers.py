@@ -149,7 +149,7 @@ async def _process_pipeline(msg: Message):
 
     # Step 2: resolve TXN + USER + ghi + notify
     if ENABLE_B2 and getattr(CFG, "B2_NOTIFY", {}).get("enabled", False):
-        def _run_b2(vndc_code: str, name_order: str):
+        def _run_b2(vndc_code: str, name_order: str, name_bank: str):
             try:
                 fields_res = resolve_user_all(vndc_code)  # <-- lấy user_id, fullname, username, vip_level, document_number
                 if "__error__" in fields_res:
@@ -158,6 +158,7 @@ async def _process_pipeline(msg: Message):
                     username = ""
                     vip_level = ""
                     document_number = ""
+                    auth_status = fields_res.get("authorizationStatus", "") or ""
                     note = f"resolve_error={fields_res['__error__']}"
                 else:
                     user_id = (fields_res.get("user_id") or "")
@@ -165,7 +166,15 @@ async def _process_pipeline(msg: Message):
                     username = (fields_res.get("username") or "")
                     vip_level = (fields_res.get("vip_level") or "")
                     document_number = (fields_res.get("document_number") or "")
+                    auth_status = (fields_res.get("authorizationStatus") or "").strip().lower()
                     note = "ok" if user_id else "resolve_none"
+
+                # map trạng thái sang tiếng Việt
+                status_map = {
+                    "authorized": "đã duyệt",
+                    "pending": "đang chờ duyệt",
+                }
+                status_vi = status_map.get(auth_status, (auth_status or ""))
 
                 row2 = {
                     "date": _iso_utc_now(),
@@ -181,30 +190,30 @@ async def _process_pipeline(msg: Message):
                 step2_ok = _append_step2(row2)
 
                 if user_id and note == "ok" and step2_ok:
-                    # Format mới theo yêu cầu:
-                    # vndc_code, Mua VNDC KCC, chuyển khoản từ name_order cho fullname: username 2b
-                    text_msg = CFG.B2_NOTIFY.get(
-                        "template",
-                        "{vndc_code}, Mua VNDC KCC, chuyển khoản từ {name_order} cho {fullname}: {username} 2b",
-                    ).format(
+                    # Dùng template từ config (có thể chứa {status_vi})
+                    text_msg = CFG.B2_NOTIFY.get("template", "").format(
                         vndc_code=vndc_code,
+                        status_vi=status_vi,
                         name_order=name_order,
+                        name_bank=name_bank,
                         fullname=(fullname or name_order),
                         username=(username or ""),
-                        user_id=user_id,  # vẫn cho phép dùng trong template nếu cần
+                        user_id=user_id,
                     )
                     send_via_ksnb(text_msg)
                     logger.info("[B2] notify sent: %s", text_msg)
+
             except Exception as e:
                 logger.exception("[B2] resolve/notify error: %s", e)
                 warn = ("⚠️ CẢNH BÁO\n"
                         "Lỗi ngoài dự kiến trong Step 2 (resolve/notify).\n"
                         f"vndc_code={vndc_code}, name_order={name_order}")
                 send_via_ksnb(warn)
+                logger.info("[B2] notify sent: %s", text_msg)
 
         threading.Thread(
             target=_run_b2,
-            args=(fields["vndc_code"], fields["name_order"]),
+            args=(fields["vndc_code"], fields["name_order"], fields["name_bank"]),  # + name_bank
             daemon=True,
         ).start()
 

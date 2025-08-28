@@ -22,6 +22,19 @@ def main() -> int:
         print(f"Unknown stage: {args.stage}"); return 2
     except Exception:
         logging.exception("FATAL in main()"); return 1
+    
+
+# === Quiet third-party noisy logs ===
+import logging
+
+# Hạ mức log của httpx / httpcore / telegram.request
+for noisy in ("httpx", "httpcore", "telegram.request"):
+    logging.getLogger(noisy).setLevel(logging.WARNING)
+
+# (tùy chọn) nếu bạn đang dùng basicConfig với level=INFO,
+# vẫn giữ INFO cho logger của bạn (vd. "listener-main", "logger-handlers"),
+# nhưng các logger trên sẽ chỉ hiện WARNING trở lên.
+
 
 if __name__ == "__main__":
     sys.exit(main())
