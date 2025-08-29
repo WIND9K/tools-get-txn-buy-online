@@ -1,0 +1,4 @@
+[submodule "OnusLibs"]
+	path = OnusLibs
+	url = https://github.com/WIND9K/OnusLibs.git
+	branch = main
