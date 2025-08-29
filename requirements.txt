@@ -1,3 +1,5 @@
 python-telegram-bot>=21.9,<23
 pandas
 git+https://github.com/WIND9K/OnusLibs.git
+git+https://github.com/WIND9K/OnusLibs.git@main
+git+https://github.com/WIND9K/OnusLibs.git@main#egg=onuslibs
