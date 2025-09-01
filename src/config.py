@@ -154,11 +154,7 @@ CSV_STEP2_COLUMNS = [
 #   "{vndc_code}, Mua VNDC KCC, chuyển khoản từ {name_order} cho {fullname} username: {username}"
 B2_NOTIFY = {
     "enabled": True,
-    # ví dụ:
-    # VNDC2630477368 - đã duyệt, Mua VNDC KCC, chuyển khoản từ A cho B username: 123456
-    "template": os.getenv(
-        "B2_NOTIFY_TEMPLATE",
-        "{vndc_code} - {status_vi}, Mua VNDC KCC, chuyển khoản từ {name_bank} cho {fullname} username: {username}"
-    ),
+    "template": "{vndc_code} - {status_vi}, Mua VNDC KCC, chuyển khoản từ {name_bank} cho {fullname} username: {username}",
     "only_when": ["ok"],
 }
+

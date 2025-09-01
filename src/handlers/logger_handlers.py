@@ -10,7 +10,7 @@ from telegram.ext import ContextTypes
 import src.config as CFG
 from src.utils.parse import parse_kcc_packet, parse_fields
 from src.utils.csv_log import append_csv
-from src.get_userid_from_txn import resolve_user_all     # ⬅⬅ thay import
+from src.get_userid_from_txn import resolve_user_all
 from src.utils.notify import send_via_ksnb
 
 logger = logging.getLogger("logger-handlers")
@@ -140,6 +140,8 @@ async def _process_pipeline(msg: Message):
         "name_bank": (pkt.get("name_bank", "") if isinstance(pkt, dict) else getattr(pkt, "name_bank", "")) or "",
         "name_order": (pkt.get("name_order", "") if isinstance(pkt, dict) else getattr(pkt, "name_order", "")) or "",
     }
+    logger.info("[KCC] parsed vndc=%s | name_bank=%s | name_order=%s",
+                fields["vndc_code"], fields["name_bank"], fields["name_order"])
     print(f"[EVENT] KCC matched vndc_code={fields['vndc_code']} | name_order={fields['name_order']}")
     row = _build_base_row(msg, text, fields)
 
@@ -151,7 +153,7 @@ async def _process_pipeline(msg: Message):
     if ENABLE_B2 and getattr(CFG, "B2_NOTIFY", {}).get("enabled", False):
         def _run_b2(vndc_code: str, name_order: str, name_bank: str):
             try:
-                fields_res = resolve_user_all(vndc_code)  # <-- lấy user_id, fullname, username, vip_level, document_number
+                fields_res = resolve_user_all(vndc_code)
                 if "__error__" in fields_res:
                     user_id = ""
                     fullname = ""
@@ -176,6 +178,9 @@ async def _process_pipeline(msg: Message):
                 }
                 status_vi = status_map.get(auth_status, (auth_status or ""))
 
+                # Fallback cho name_bank
+                display_from = name_bank or name_order or "(không rõ)"
+
                 row2 = {
                     "date": _iso_utc_now(),
                     "vndc_code": vndc_code,
@@ -195,7 +200,7 @@ async def _process_pipeline(msg: Message):
                         vndc_code=vndc_code,
                         status_vi=status_vi,
                         name_order=name_order,
-                        name_bank=name_bank,
+                        name_bank=display_from,
                         fullname=(fullname or name_order),
                         username=(username or ""),
                         user_id=user_id,
@@ -209,11 +214,10 @@ async def _process_pipeline(msg: Message):
                         "Lỗi ngoài dự kiến trong Step 2 (resolve/notify).\n"
                         f"vndc_code={vndc_code}, name_order={name_order}")
                 send_via_ksnb(warn)
-                logger.info("[B2] notify sent: %s", text_msg)
 
         threading.Thread(
             target=_run_b2,
-            args=(fields["vndc_code"], fields["name_order"], fields["name_bank"]),  # + name_bank
+            args=(fields["vndc_code"], fields["name_order"], fields["name_bank"]),
             daemon=True,
         ).start()
 
