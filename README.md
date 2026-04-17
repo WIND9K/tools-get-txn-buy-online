@@ -1,4 +1,4 @@
-# Onus procesc user - get txn onus buy online
+#  procesc user - get txn  buy online
 
 
 Bot Telegram lưu tin nhắn **bắt đầu bằng `KCC`** trong group vào CSV, kèm các trường đã tách: `vndc_code`, `name_bank`, `name_order`.
